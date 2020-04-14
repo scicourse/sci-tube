@@ -52,17 +52,17 @@ class MainWindow(QMainWindow):
         file_menu.addAction(open_file_action)
         file_toolbar.addAction(open_file_action)
 
-        saveas_file_action = QAction(QIcon(os.path.join('images', 'disk--pencil.png')), "Save As...", self)
-        saveas_file_action.setStatusTip("Save current page to specified file")
-        saveas_file_action.triggered.connect(self.file_saveas)
-        file_menu.addAction(saveas_file_action)
-        file_toolbar.addAction(saveas_file_action)
+#        saveas_file_action = QAction(QIcon(os.path.join('images', 'disk--pencil.png')), "Save As...", self)
+#        saveas_file_action.setStatusTip("Save current page to specified file")
+#        saveas_file_action.triggered.connect(self.file_saveas)
+#        file_menu.addAction(saveas_file_action)
+#        file_toolbar.addAction(saveas_file_action)
 
 
         self.window.setLayout(self.grid)
         
     
-        self.setWindowTitle("SciTube Widget")
+        self.setWindowTitle("SciTube")
         self.resize(1000, 600)
     
     def createTopLeftGroupBox(self):
@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
         self.TopRightGroupBox.setLayout(layoutTR)
     def convert_to_tube(self):
         self.tube_convert()
-        tubeimage = QImage('nanotube.png')
+        tubeimage = QImage('structs/nanotube.png')
         self.tubeLabel.setPixmap(QPixmap.fromImage(tubeimage))
     def createBottomLeftTabWidget(self):
         self.BottomLeftGroupBox = QGroupBox("Tube")
@@ -119,14 +119,16 @@ class MainWindow(QMainWindow):
         layoutBR = QVBoxLayout()
         layoutBR.addWidget(QLabel('1- Just click on open file icon'))
         layoutBR.addWidget(QLabel("2- Choose Cif format of your structure"))
+        layoutBR.addWidget(QLabel("3- Enter Vacuum and length of the ribbon"))
+        layoutBR.addWidget(QLabel("4- Then Press 'convert to nanotube' and find your structure in structs Folder"))
         self.BottomRightGroupBox.setLayout(layoutBR)
     def file_open(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "Crystallographic Information File (*.cif);All files (*.*)")
         self.primitive_cell = read(path)
 
-        write('primitive_cell.png', self.primitive_cell, rotation='90z,-90x')
+        write('structs/primitive_cell.png', self.primitive_cell, rotation='90z,-90x')
 
-        image = QImage('primitive_cell.png')
+        image = QImage('structs/primitive_cell.png')
         self.imageLabel.setPixmap(QPixmap.fromImage(image))
     def tube_convert(self):
         try:
@@ -138,7 +140,7 @@ class MainWindow(QMainWindow):
                 super_struct = make_supercell(self.primitive_cell, self.p)
             elif str(self.supported_structure.currentText()) == 'Y':
                 self.p = np.array([[0 ,1 ,0],
-                                   [a ,0 ,0],
+                                   [-a ,0 ,0],
                                    [0 ,0 ,1]])
                 super_struct = make_supercell(self.primitive_cell, self.p)
                 write('super.cif', super_struct)
@@ -164,8 +166,8 @@ class MainWindow(QMainWindow):
 
             s.center(vacuum=float(str(self.vac.text())), axis=(1,2))
 
-            write('nanotube.xsf', s)
-            write('nanotube.png', s, rotation='90z,-90x')
+            write('structs/nanotube.xsf', s)
+            write('structs/nanotube.png', s, rotation='90z,-90x')
         except Exception as e:
             self.dialog_critical(str(e))
 

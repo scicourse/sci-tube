@@ -11,14 +11,16 @@ Installation instruction:
 
 	conda activate pyqt-ase 
 
-	conda install python=3.6.7 
+	conda install python
 
-	conda install -c matsci ase 
+	conda install -c conda-forge ase 
 
 	conda install -c anaconda pyqt 
 
 3 - Run the code by:
 
-	python gui.py 
+	python gui.py
+
+You can find your generated structures in structs Folder
 
 This code is written by anush kazemi, Visit Us at Sci-Course.ir
