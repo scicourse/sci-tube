@@ -80,7 +80,6 @@ class MainWindow(QMainWindow):
     def createTopRightGroupBox(self):
         self.TopRightGroupBox = QGroupBox("General Options")
         self.supported_structure = QComboBox()
-        #self.combo2 = QComboBox()
         self.tube_radius = QLineEdit()
         self.vac = QLineEdit()
         self.convert_button = QPushButton('Convert to NanoTube')
@@ -97,29 +96,13 @@ class MainWindow(QMainWindow):
         layoutTR.addWidget(self.vac, 1, 1)
         layoutTR.addWidget(QLabel('Enter length of the ribbon'), 2, 0)
         layoutTR.addWidget(self.tube_radius, 2, 1)
-        #layoutTR.addWidget(QLabel('Anchor Atom'), 3, 0)
-        #layoutTR.addWidget(self.anchor_atom, 3, 1)
         layoutTR.addWidget(self.convert_button, 3, 0)
 
-        #layoutTR.setColumnStretch(1, 1) # Only column 1 can stretch, column 0 fixed size
         self.TopRightGroupBox.setLayout(layoutTR)
-    #def _updateCombo2(self, text):
-    #    self.combo2.clear()
-        #if text == '2D structure with Buckling':
-        #    self.combo2.addItems(('No Selection'))
-        #elif text == 'flat 2D structure like Graphene':
-        #    self.combo2.addItems(('No Selection'))
-    #    if text == 'multilayer structure like MoS2':
-    #        self.combo2.addItems(("Orthogonal-ArmChair", "Orthogonal-ZigZag", "164 SpaceGroup"))
     def convert_to_tube(self):
-        #if str(self.combo2.currentText()) == 'Orthogonal-ArmChair' and str(self.supported_structure.currentText()) == 'multilayer structure like MoS2':
         self.tube_convert()
         tubeimage = QImage('nanotube.png')
         self.tubeLabel.setPixmap(QPixmap.fromImage(tubeimage))
-        #elif str(self.supported_structure.currentText()) == 'flat 2D structure like Graphene':
-        #    self.tube_convert_flat()
-        #    tubeimage = QImage('nanotube_flat.png')
-        #    self.tubeLabel.setPixmap(QPixmap.fromImage(tubeimage))
     def createBottomLeftTabWidget(self):
         self.BottomLeftGroupBox = QGroupBox("Tube")
         layoutBL = QVBoxLayout()
@@ -186,61 +169,6 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.dialog_critical(str(e))
 
-    def tube_convert_164(self):
-        try:
-            a = float(str(self.tube_radius.text()))
-            self.p = np.array([[1 ,0 ,0],
-                               [0 ,a ,0],
-                               [0 ,0 ,1]])
-            super_struct = make_supercell(self.primitive_cell, self.p)
-            super_struct.center(vacuum=15.0, axis=2)
-            R = super_struct.get_cell_lengths_and_angles()[1]
-            RS = R / (2 * np.pi)
-            s = super_struct.copy()
-            anchor_atom = str(self.anchor_atom.text())
-
-            x = []
-            for atom in s:
-                x.append(atom.symbol == anchor_atom)
-            anchor_position = s.positions[x][:,2][0]
-
-            delta = []
-
-            for counter, val in enumerate(s.get_positions()[:,2]):
-                delta.append(s.get_positions()[:,2][counter] - anchor_position)
-            s.positions[:,2] = (RS + delta) * np.cos(2 * np.pi * s.positions[:,1]/R)
-            s.positions[:,1] = (RS + delta) * np.sin(2 * np.pi * s.positions[:,1]/R)
-
-            s.center(vacuum=15.0)
-
-            write('nanotube_164.xsf', s)
-            write('nanotube_164.png', s, rotation='90z,-90x')
-
-        except Exception as e:
-            self.dialog_critical(str(e))
-
-    def tube_convert_flat(self):
-        try:
-            a = float(str(self.tube_radius.text()))
-            self.p = np.array([[1 ,0 ,0],
-                               [0 ,a ,0],
-                               [0 ,0 ,1]])
-            super_struct = make_supercell(self.primitive_cell, self.p)
-            super_struct.center(vacuum=15.0, axis=2)
-            R = super_struct.get_cell_lengths_and_angles()[1]
-            RS = R / (2 * np.pi)
-            s = super_struct.copy()
-            
-            s.positions[:,2] = RS * np.cos(2 * np.pi * s.positions[:,1]/R)
-            s.positions[:,1] = RS * np.sin(2 * np.pi * s.positions[:,1]/R)
-
-            s.center(vacuum=15.0, axis=(1,2))
-
-            write('nanotube_flat.xsf', s)
-            write('nanotube_flat.png', s, rotation='90z,-90x')
-
-        except Exception as e:
-            self.dialog_critical(str(e))
     def file_saveas(self):
         path, _ = QFileDialog.getSaveFileName(self, "Export Data", "", "XCrySDen structure format (*.xsf);All files (*.*)")
 
