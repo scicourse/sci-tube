@@ -22,5 +22,3 @@ Installation instruction:
 	python gui.py
 
 You can find your generated structures in structs Folder
-
-This code is written by anush kazemi, Visit Us at Sci-Course.ir
